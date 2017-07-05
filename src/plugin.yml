@@ -1,0 +1,10 @@
+name: ShulkerGun
+main: cc.isotopestudio.shulkergun.ShulkerGun
+author: Mars
+description: ShulkerGun
+website: http://isotopestudio.cc
+version: 1.0.0
+commands:
+  battery:
+    description: ShulkerGun
+    usage: /<command>
