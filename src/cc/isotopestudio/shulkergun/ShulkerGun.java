@@ -1,5 +1,10 @@
 package cc.isotopestudio.shulkergun;
 
+import cc.isotopestudio.shulkergun.cmd.CommandBattery;
+import cc.isotopestudio.shulkergun.listener.GunAttackListener;
+import cc.isotopestudio.shulkergun.listener.PlayerInteractGunListener;
+import cc.isotopestudio.shulkergun.shulker.GunFireTask;
+import cc.isotopestudio.shulkergun.shulker.LoadGunTask;
 import cc.isotopestudio.shulkergun.util.PluginFile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,35 +14,43 @@ public class ShulkerGun extends JavaPlugin {
 
     private static final String pluginName = "ShulkerGun";
     public static final String prefix = (new StringBuilder()).append(ChatColor.GOLD).append(ChatColor.BOLD).append("[")
-            .append("ShulkerGun").append("]").append(ChatColor.RED).toString();
+            .append("炮台").append("]").append(ChatColor.RED).toString();
 
     public static ShulkerGun plugin;
 
     public static PluginFile config;
-    public static PluginFile playerData;
+    public static PluginFile shulkerData;
 
     @Override
     public void onEnable() {
         plugin = this;
-//        config = new PluginFile(this, "config.yml", "config.yml");
-//        config.setEditable(false);
-//        playerData = new PluginFile(this, "player.yml");
+        config = new PluginFile(this, "config.yml", "config.yml");
+        config.setEditable(false);
+        shulkerData = new PluginFile(this, "shulker.yml");
 
-        //this.getCommand("csclass").setExecutor(new CommandCsclass());
+        this.getCommand("battery").setExecutor(new CommandBattery());
 
-        Bukkit.getPluginManager().registerEvents(new ShulkerTest(), this);
+//        Bukkit.getPluginManager().registerEvents(new ShulkerTest(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractGunListener(), this);
+        Bukkit.getPluginManager().registerEvents(new GunAttackListener(), this);
 
-        getLogger().info(pluginName + "鎴愬姛鍔犺浇!");
-        getLogger().info(pluginName + "鐢盜SOTOPE Studio鍒朵綔!");
+        new LoadGunTask().runTaskLater(this, 1);
+        new GunFireTask().runTaskTimer(this, 20, 20);
+
+        getLogger().info(pluginName + "成功加载!");
+        getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
     }
 
     public void onReload() {
+        config.reload();
+        shulkerData.reload();
+        new LoadGunTask().runTaskLater(this, 1);
     }
 
     @Override
     public void onDisable() {
-        getLogger().info(pluginName + "鎴愬姛鍗歌浇!");
+        getLogger().info(pluginName + "成功卸载!");
     }
 
 }
