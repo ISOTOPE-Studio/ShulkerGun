@@ -33,24 +33,24 @@ public class CommandBattery implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("battery")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(S.toPrefixRed("玩家执行的命令"));
-                return true;
-            }
-            Player player = (Player) sender;
 //            if (!player.hasPermission("battery.player")) {
 //                player.sendMessage(S.toPrefixRed("你没有权限"));
 //                return true;
 //            }
             if (args.length < 1) {
-                player.sendMessage(S.toPrefixGreen("帮助菜单"));
-                if (player.isOp())
-                    player.sendMessage(S.toYellow("/" + label + " get - 获得一个潜影盒炮台"));
-                player.sendMessage(S.toYellow("/" + label + " shut <玩家名字> - 光标上的潜影盒炮台屏蔽玩家"));
-                player.sendMessage(S.toYellow("/" + label + " shutall <玩家名字> - 所有潜影盒炮台屏蔽玩家"));
-                player.sendMessage(S.toYellow("/" + label + " list - 查看潜影盒炮台列表"));
+                sender.sendMessage(S.toPrefixGreen("帮助菜单"));
+                if (sender.isOp())
+                    sender.sendMessage(S.toYellow("/" + label + " get - 获得一个潜影盒炮台"));
+                sender.sendMessage(S.toYellow("/" + label + " shut <玩家名字> - 光标上的潜影盒炮台屏蔽玩家"));
+                sender.sendMessage(S.toYellow("/" + label + " shutall <玩家名字> - 所有潜影盒炮台屏蔽玩家"));
+                sender.sendMessage(S.toYellow("/" + label + " list - 查看潜影盒炮台列表"));
                 return true;
             }
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(S.toPrefixRed("玩家执行的命令"));
+                return true;
+            }
+            Player player = (Player) sender;
             if (args[0].equalsIgnoreCase("shutall")) {
                 if (args.length < 2) {
                     player.sendMessage(S.toYellow("/" + label + " shutall <玩家名字> - 所有潜影盒炮台屏蔽玩家"));
@@ -123,6 +123,15 @@ public class CommandBattery implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("get")) {
+                if (!player.isOp()) {
+                    player.sendMessage(S.toPrefixRed("你没有权限"));
+                    return true;
+                }
+                player.getInventory().addItem(GUNITEM);
+                player.sendMessage(S.toPrefixGreen("成功"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list")) {
                 if (!player.isOp()) {
                     player.sendMessage(S.toPrefixRed("你没有权限"));
                     return true;

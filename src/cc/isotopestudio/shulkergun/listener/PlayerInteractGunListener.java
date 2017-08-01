@@ -4,11 +4,13 @@ package cc.isotopestudio.shulkergun.listener;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.shulkergun.gui.GunUpdateGUI;
 import cc.isotopestudio.shulkergun.shulker.Gun;
 import cc.isotopestudio.shulkergun.util.S;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,8 +56,6 @@ public class PlayerInteractGunListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        System.out.println(event.getClickedBlock().getLocation());
-        System.out.println(GUNS.keySet());
         if (!GUNS.containsKey(event.getClickedBlock().getLocation())) {
             return;
         }
@@ -65,7 +65,7 @@ public class PlayerInteractGunListener implements Listener {
         if (!player.getName().equals(gun.getPlayerName())) {
             return;
         }
-        player.sendMessage(S.toPrefixGreen("这是你的炮台"));
+        new GunUpdateGUI(player, gun).open(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -76,25 +76,39 @@ public class PlayerInteractGunListener implements Listener {
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
             return;
         }
-        if (!GUNS.containsKey(event.getClickedBlock().getLocation())) {
+        Location loc = event.getClickedBlock().getLocation();
+        if (!GUNS.containsKey(loc)) {
             return;
         }
         event.setCancelled(true);
         Player player = event.getPlayer();
-        Gun gun = GUNS.get(event.getClickedBlock().getLocation());
-        if (!player.getName().equals(gun.getPlayerName())) {
+        Gun gun = GUNS.get(loc);
+        if (player.getName().equals(gun.getPlayerName()) &&
+                player.getInventory().getItemInMainHand().getType() == Material.SNOW_BALL) {
+            gun.remove();
+            player.sendMessage(S.toPrefixGreen("成功删除炮台"));
             return;
         }
-        if (player.getInventory().getItemInMainHand().getType() != Material.SNOW_BALL) {
-            if (gun.getPlayerName().equals(player.getName())) {
-                player.sendMessage(S.toPrefixYellow("请使用雪球删除炮台"));
-            } else {
-                player.sendMessage(S.toPrefixRed("这不是你的炮台"));
+        if (gun.getPlayerName().equals(player.getName())) {
+            player.sendMessage(S.toPrefixYellow("请使用雪球删除炮台"));
+        } else {
+            loc.add(0.5, 0.5, 0.5);
+            loc.getWorld().spawnParticle(Particle.CRIT, loc, 10, 1, 1, 1, 0);
+            loc.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, loc, 5, 1, 1, 1, 0);
+            loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 5);
+            ItemStack apple = new ItemStack(Material.REDSTONE);
+            for (int i = 0; i < 20; i++) {
+                loc.getWorld().spawnParticle(Particle.ITEM_CRACK,
+                        loc.clone().add(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1), 1, 0, 0, 0, 0, apple);
             }
-            return;
+            if (gun.alterHealth(-2)) {
+                player.sendMessage(S.toPrefixYellow("炮台: ") + gun.getHealth() + " / " + S.toRed("" + gun.getMaxHealth()));
+
+            } else {
+                player.sendMessage(S.toPrefixYellow("炮台已被破坏"));
+            }
         }
-        gun.remove();
-        player.sendMessage(S.toPrefixGreen("成功删除炮台"));
+        return;
     }
 
 }

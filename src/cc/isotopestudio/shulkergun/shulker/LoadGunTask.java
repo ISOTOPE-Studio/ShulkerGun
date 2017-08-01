@@ -6,7 +6,6 @@ package cc.isotopestudio.shulkergun.shulker;
 
 import cc.isotopestudio.shulkergun.util.S;
 import cc.isotopestudio.shulkergun.util.Util;
-import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,6 +16,7 @@ import java.util.List;
 import static cc.isotopestudio.shulkergun.ShulkerGun.shulkerData;
 import static cc.isotopestudio.shulkergun.shulker.Gun.GUNITEM;
 import static cc.isotopestudio.shulkergun.shulker.Gun.GUNS;
+import static cc.isotopestudio.shulkergun.shulker.Gun.UUIDGUNS;
 
 public class LoadGunTask extends BukkitRunnable {
     @Override
@@ -30,6 +30,7 @@ public class LoadGunTask extends BukkitRunnable {
         GUNITEM.setItemMeta(meta);
 
         GUNS.clear();
+        UUIDGUNS.clear();
         shulkerData.getKeys(false).forEach(locString -> {
             new Gun(Util.stringToLocation(locString));
         });

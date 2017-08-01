@@ -3,7 +3,8 @@ package cc.isotopestudio.shulkergun;
 import cc.isotopestudio.shulkergun.cmd.CommandBattery;
 import cc.isotopestudio.shulkergun.listener.GunAttackListener;
 import cc.isotopestudio.shulkergun.listener.PlayerInteractGunListener;
-import cc.isotopestudio.shulkergun.shulker.GunFireTask;
+import cc.isotopestudio.shulkergun.shulker.GunParticleTask;
+import cc.isotopestudio.shulkergun.shulker.GunRegenTask;
 import cc.isotopestudio.shulkergun.shulker.LoadGunTask;
 import cc.isotopestudio.shulkergun.util.PluginFile;
 import org.bukkit.Bukkit;
@@ -35,7 +36,8 @@ public class ShulkerGun extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new GunAttackListener(), this);
 
         new LoadGunTask().runTaskLater(this, 1);
-        new GunFireTask().runTaskTimer(this, 20, 20);
+        new GunParticleTask().runTaskTimer(this, 20, 20);
+        new GunRegenTask().runTaskTimer(this, 20, 60);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
