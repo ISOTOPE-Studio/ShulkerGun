@@ -6,6 +6,7 @@ package cc.isotopestudio.shulkergun.cmd;
 
 import cc.isotopestudio.shulkergun.shulker.Gun;
 import cc.isotopestudio.shulkergun.util.S;
+import cc.isotopestudio.shulkergun.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.util.Set;
 
+import static cc.isotopestudio.shulkergun.ShulkerGun.plugin;
 import static cc.isotopestudio.shulkergun.shulker.Gun.GUNITEM;
 import static cc.isotopestudio.shulkergun.shulker.Gun.GUNS;
 
@@ -33,10 +35,6 @@ public class CommandBattery implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("battery")) {
-//            if (!player.hasPermission("battery.player")) {
-//                player.sendMessage(S.toPrefixRed("你没有权限"));
-//                return true;
-//            }
             if (args.length < 1) {
                 sender.sendMessage(S.toPrefixGreen("帮助菜单"));
                 if (sender.isOp())
@@ -44,6 +42,16 @@ public class CommandBattery implements CommandExecutor {
                 sender.sendMessage(S.toYellow("/" + label + " shut <玩家名字> - 光标上的潜影盒炮台屏蔽玩家"));
                 sender.sendMessage(S.toYellow("/" + label + " shutall <玩家名字> - 所有潜影盒炮台屏蔽玩家"));
                 sender.sendMessage(S.toYellow("/" + label + " list - 查看潜影盒炮台列表"));
+                sender.sendMessage(S.toYellow("/" + label + " reload - 重载"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("reload")) {
+                if (!sender.isOp()) {
+                    sender.sendMessage(S.toPrefixRed("你没有权限"));
+                    return true;
+                }
+                plugin.onReload();
+                sender.sendMessage(S.toPrefixGreen("成功"));
                 return true;
             }
             if (!(sender instanceof Player)) {
@@ -132,12 +140,12 @@ public class CommandBattery implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("list")) {
-                if (!player.isOp()) {
-                    player.sendMessage(S.toPrefixRed("你没有权限"));
-                    return true;
-                }
-                player.getInventory().addItem(GUNITEM);
-                player.sendMessage(S.toPrefixGreen("成功"));
+                player.sendMessage(S.toPrefixGreen("--- 你的炮台 ---"));
+                GUNS.values().stream()
+                        .filter(gun -> gun.getPlayerName().equals(player.getName()))
+                        .forEach(gun ->
+                                player.sendMessage(" - " +
+                                        S.toYellow(Util.locationToString(gun.getLocation()))));
                 return true;
             }
             player.sendMessage(S.toPrefixRed("未知指令"));

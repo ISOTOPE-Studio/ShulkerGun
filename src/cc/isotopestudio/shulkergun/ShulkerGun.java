@@ -39,7 +39,7 @@ public class ShulkerGun extends JavaPlugin {
         new GunParticleTask().runTaskTimer(this, 20, 20);
         new GunRegenTask().runTaskTimer(this, 20, 60);
 
-        getLogger().info(pluginName + "成功加载!");
+        getLogger().info(pluginName + " " + getDescription().getVersion() + " 成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
     }
