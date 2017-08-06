@@ -21,6 +21,7 @@ public class ShulkerGun extends JavaPlugin {
 
     public static PluginFile config;
     public static PluginFile shulkerData;
+    public static PluginFile playerData;
 
     @Override
     public void onEnable() {
@@ -28,6 +29,7 @@ public class ShulkerGun extends JavaPlugin {
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
         shulkerData = new PluginFile(this, "shulker.yml");
+        playerData = new PluginFile(this, "player.yml");
 
         this.getCommand("battery").setExecutor(new CommandBattery());
 

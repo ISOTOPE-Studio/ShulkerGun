@@ -18,8 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cc.isotopestudio.shulkergun.ShulkerGun.plugin;
-import static cc.isotopestudio.shulkergun.ShulkerGun.shulkerData;
+import static cc.isotopestudio.shulkergun.ShulkerGun.*;
 import static cc.isotopestudio.shulkergun.util.Util.locationToString;
 
 public class Gun extends BukkitRunnable {
@@ -37,10 +36,10 @@ public class Gun extends BukkitRunnable {
     public static final int STEPrange = 1;
     public static final int STEPattack = 1;
     public static final int STEPspeed = 1;
-    public static final ItemStack ITEMmaxHealth = new ItemStack(Material.IRON_INGOT, 5);
-    public static final ItemStack ITEMrange = new ItemStack(Material.GOLD_INGOT, 5);
-    public static final ItemStack ITEMattack = new ItemStack(Material.DIAMOND, 3);
-    public static final ItemStack ITEMspeed = new ItemStack(Material.EMERALD, 3);
+    public static final ItemStack ITEMmaxHealth = new ItemStack(Material.IRON_INGOT, 25);
+    public static final ItemStack ITEMrange = new ItemStack(Material.GOLD_INGOT, 25);
+    public static final ItemStack ITEMattack = new ItemStack(Material.DIAMOND, 15);
+    public static final ItemStack ITEMspeed = new ItemStack(Material.EMERALD, 15);
 
     public static final Map<Location, Gun> GUNS = new HashMap<>();
     public static final Map<UUID, Gun> UUIDGUNS = new HashMap<>();
@@ -62,6 +61,7 @@ public class Gun extends BukkitRunnable {
     private int speed = INTspeed;
 
     private final ConfigurationSection config;
+    private final ConfigurationSection playerConfig;
     private int health = 20;
 
     /**
@@ -70,14 +70,21 @@ public class Gun extends BukkitRunnable {
     Gun(Location loc) {
         this.loc = loc;
         String locString = locationToString(loc);
+
         assert shulkerData.isConfigurationSection(locString);
         config = shulkerData.getConfigurationSection(locString);
+
         playerName = config.getString("player");
+        assert shulkerData.isConfigurationSection(playerName);
+        playerConfig = playerData.getConfigurationSection(playerName);
+
         blockedPlayer.addAll(config.getStringList("blocked"));
-        health = maxHealth = config.getInt("maxHealth", INTmaxHealth);
-        range = config.getInt("range", INTrange);
-        attack = config.getInt("attack", INTattack);
-        speed = config.getInt("speed", INTspeed);
+
+        health = maxHealth = playerConfig.getInt("maxHealth", INTmaxHealth);
+        range = playerConfig.getInt("range", INTrange);
+        attack = playerConfig.getInt("attack", INTattack);
+        speed = playerConfig.getInt("speed", INTspeed);
+
         runTaskTimer(plugin, 0, 10 * 20 / speed);
         GUNS.put(loc, this);
         UUIDGUNS.put(uuid, this);
@@ -91,11 +98,21 @@ public class Gun extends BukkitRunnable {
         this.playerName = playerName;
         String locString = locationToString(loc);
         config = shulkerData.createSection(locString);
+        if (playerData.isConfigurationSection(playerName)) {
+            playerConfig = playerData.getConfigurationSection(playerName);
+            health = maxHealth = playerConfig.getInt("maxHealth", INTmaxHealth);
+            range = playerConfig.getInt("range", INTrange);
+            attack = playerConfig.getInt("attack", INTattack);
+            speed = playerConfig.getInt("speed", INTspeed);
+        } else {
+            playerConfig = playerData.createSection(playerName);
+            playerConfig.set("maxHealth", INTmaxHealth);
+            playerConfig.set("range", INTrange);
+            playerConfig.set("attack", INTattack);
+            playerConfig.set("speed", INTspeed);
+            playerData.save();
+        }
         set("player", playerName);
-        config.set("maxHealth", INTmaxHealth);
-        config.set("range", INTrange);
-        config.set("attack", INTattack);
-        config.set("speed", INTspeed);
         shulkerData.save();
         runTaskTimer(plugin, 0, 10 * 20 / speed);
         GUNS.put(loc, this);
@@ -140,8 +157,8 @@ public class Gun extends BukkitRunnable {
     public boolean upgradeAttack() {
         if (attack == TOPattack) return false;
         this.attack += STEPattack;
-        config.set("attack", this.attack);
-        shulkerData.save();
+        playerConfig.set("attack", this.attack);
+        playerData.save();
         return true;
     }
 
@@ -152,8 +169,8 @@ public class Gun extends BukkitRunnable {
     public boolean upgradeSpeed() {
         if (speed == TOPspeed) return false;
         this.speed += STEPspeed;
-        config.set("speed", this.speed);
-        shulkerData.save();
+        playerConfig.set("speed", this.speed);
+        playerData.save();
         try {
             cancel();
         } catch (IllegalStateException e) {
@@ -170,8 +187,8 @@ public class Gun extends BukkitRunnable {
     public boolean upgradeMaxHealth() {
         if (maxHealth == TOPmaxHealth) return false;
         this.maxHealth += STEPmaxHealth;
-        config.set("maxHealth", this.maxHealth);
-        shulkerData.save();
+        playerConfig.set("maxHealth", this.maxHealth);
+        playerData.save();
         return true;
     }
 
@@ -182,8 +199,8 @@ public class Gun extends BukkitRunnable {
     public boolean upgradeRange() {
         if (range == TOPrange) return false;
         this.range += STEPrange;
-        config.set("range", this.range);
-        shulkerData.save();
+        playerConfig.set("range", this.range);
+        playerData.save();
         return true;
     }
 
